@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Saevash.io</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #06060c;
+      --surface:  #0e0e1a;
+      --surface2: #16162a;
+      --accent:   #aaff3e;
+      --accent2:  #ff5f3e;
+      --muted:    #3a3a5c;
+      --text:     #d8d8f0;
+      --textdim:  #7070a0;
+      --font-head: 'Rajdhani', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* Noise overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem;
+      background: rgba(6,6,12,0.7);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(170,255,62,0.08);
+    }
+
+    .nav-logo {
+      font-family: var(--font-head);
+      font-size: 1.5rem; font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--text); }
+
+    .nav-links {
+      display: flex; gap: 2.5rem; list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.78rem; font-weight: 400;
+      color: var(--textdim);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 8rem 3rem 4rem;
+      gap: 2rem;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute; right: -10%; top: 10%;
+      width: 60vw; height: 60vw; max-width: 700px; max-height: 700px;
+      background: radial-gradient(circle, rgba(170,255,62,0.07) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: pulse 6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.08); opacity: 0.7; }
+    }
+
+    .hero-text { position: relative; z-index: 1; }
+
+    .hero-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+    }
+
+    .hero-title {
+      font-family: var(--font-head);
+      font-size: clamp(4rem, 8vw, 7rem);
+      font-weight: 700;
+      line-height: 0.95;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
+    }
+
+    .hero-title .line2 {
+      color: var(--accent);
+      display: block;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--textdim);
+      max-width: 480px;
+      margin-bottom: 2.5rem;
+      opacity: 0; animation: fadeUp 0.8s 0.6s forwards;
+    }
+
+    .hero-ctas {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.75rem 1.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 2px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #060609;
+      font-weight: 500;
+    }
+    .btn-primary:hover { background: #c8ff60; transform: translateY(-2px); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--muted);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    /* Hero right — big glitchy number */
+    .hero-visual {
+      position: relative; z-index: 1;
+      display: flex; justify-content: center; align-items: center;
+    }
+
+    .hero-tag-big {
+      font-family: var(--font-head);
+      font-size: clamp(10rem, 18vw, 18rem);
+      font-weight: 700;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(170,255,62,0.15);
+      letter-spacing: -0.04em;
+      line-height: 1;
+      user-select: none;
+      position: relative;
+      opacity: 0; animation: fadeIn 1s 0.5s forwards;
+    }
+
+    .hero-tag-big::before {
+      content: attr(data-text);
+      position: absolute; inset: 0;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255,95,62,0.1);
+      clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+      transform: translateX(4px);
+      animation: glitch 4s infinite;
+    }
+
+    @keyframes glitch {
+      0%, 95%, 100% { transform: translateX(0); opacity: 0; }
+      96% { transform: translateX(6px); opacity: 1; }
+      97% { transform: translateX(-4px); }
+      98% { transform: translateX(2px); opacity: 0.5; }
+    }
+
+    /* ── SECTION COMMON ── */
+    section { position: relative; z-index: 1; }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-family: var(--font-head);
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+
+    /* ── POSTS SECTION ── */
+    .posts {
+      padding: 6rem 3rem;
+      max-width: 1200px; margin: 0 auto;
+    }
+
+    .posts-header {
+      display: flex; align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 3.5rem;
+      border-bottom: 1px solid var(--muted);
+      padding-bottom: 1.5rem;
+    }
+
+    .posts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 1.5px;
+      background: var(--muted);
+    }
+
+    .post-card {
+      background: var(--surface);
+      padding: 2.5rem;
+      text-decoration: none;
+      display: flex; flex-direction: column;
+      transition: background 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .post-card:hover { background: var(--surface2); }
+
+    .post-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--accent);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    .post-card:hover::before { transform: scaleX(1); }
+
+    .post-card.featured {
+      grid-row: 1 / 3;
+      padding: 3.5rem;
+    }
+
+    .post-tag {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .post-card.featured .post-title {
+      font-family: var(--font-head);
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .post-title {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+      line-height: 1.2;
+    }
+
+    .post-excerpt {
+      font-size: 0.9rem;
+      color: var(--textdim);
+      flex: 1;
+      margin-bottom: 1.5rem;
+    }
+
+    .post-meta {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      display: flex; gap: 1rem;
+    }
+
+    /* ── ABOUT STRIP ── */
+    .about-strip {
+      border-top: 1px solid var(--muted);
+      border-bottom: 1px solid var(--muted);
+      padding: 5rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 5rem;
+      max-width: 1200px; margin: 0 auto;
+      align-items: center;
+    }
+
+    .about-name {
+      font-family: var(--font-head);
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 700;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+    }
+
+    .about-name .accent { color: var(--accent); display: block; }
+
+    .about-body { color: var(--textdim); font-size: 1rem; }
+    .about-body p { margin-bottom: 1rem; }
+
+    .tags {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 0.3rem 0.8rem;
+      border: 1px solid var(--muted);
+      color: var(--textdim);
+      border-radius: 2px;
+      letter-spacing: 0.08em;
+    }
+    .tag:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 3rem;
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      max-width: 1200px; margin: 0 auto;
+    }
+
+    .footer-logo {
+      font-family: var(--font-head);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+    }
+
+    .footer-copy {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { gap: 1.5rem; }
+      .hero { grid-template-columns: 1fr; padding: 6rem 1.5rem 3rem; }
+      .hero-visual { display: none; }
+      .posts { padding: 4rem 1.5rem; }
+      .posts-grid { grid-template-columns: 1fr; }
+      .post-card.featured { grid-row: auto; }
+      .about-strip { grid-template-columns: 1fr; padding: 4rem 1.5rem; gap: 2rem; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a class="nav-logo" href="#">SAEVASH<span>.io</span></a>
+    <ul class="nav-links">
+      <li><a href="#posts">Posts</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-text">
+      <p class="hero-tag">// personal space online</p>
+      <h1 class="hero-title">
+        Welcome<br>
+        <span class="line2">to my corner.</span>
+      </h1>
+      <p class="hero-desc">
+        Gaming, thoughts, reviews and whatever else crosses my mind.
+        This is Saevash's little slice of the internet — unfiltered.
+      </p>
+      <div class="hero-ctas">
+        <a href="#posts" class="btn btn-primary">Read Posts</a>
+        <a href="#about" class="btn btn-outline">About me</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-tag-big" data-text="S.">.io</div>
+    </div>
+  </section>
+
+  <!-- POSTS -->
+  <section class="posts" id="posts">
+    <div class="posts-header">
+      <div>
+        <p class="section-label">// latest posts</p>
+        <h2 class="section-title">What's on my mind</h2>
+      </div>
+      <a href="#" class="btn btn-outline" style="margin-bottom:0.5rem">All posts →</a>
+    </div>
+
+    <div class="posts-grid">
+
+      <!-- Featured post -->
+      <a href="#" class="post-card featured">
+        <span class="post-tag">🎮 gaming</span>
+        <h3 class="post-title">Why I keep coming back to older games in 2026</h3>
+        <p class="post-excerpt">
+          There's something that modern AAA titles can't quite replicate — that feeling of discovery, 
+          of figuring things out with no hand-holding. I've been thinking about why I keep returning 
+          to my backlog instead of the shiny new releases...
+        </p>
+        <div class="post-meta">
+          <span>May 2026</span>
+          <span>·</span>
+          <span>5 min read</span>
+        </div>
+      </a>
+
+      <!-- Side post 1 -->
+      <a href="#" class="post-card">
+        <span class="post-tag">💭 thoughts</span>
+        <h3 class="post-title">First post. Hello, internet.</h3>
+        <p class="post-excerpt">
+          So I finally did it. Built my own little corner of the web...
+        </p>
+        <div class="post-meta">
+          <span>May 2026</span>
+          <span>·</span>
+          <span>2 min read</span>
+        </div>
+      </a>
+
+      <!-- Side post 2 -->
+      <a href="#" class="post-card">
+        <span class="post-tag">🎵 music &amp; vibes</span>
+        <h3 class="post-title">What I've been listening to lately</h3>
+        <p class="post-excerpt">
+          My playlist rotations say a lot about my mood — here's what's been on repeat...
+        </p>
+        <div class="post-meta">
+          <span>May 2026</span>
+          <span>·</span>
+          <span>3 min read</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-strip">
+      <div>
+        <div class="about-name">
+          I'm
+          <span class="accent">Saevash.</span>
+        </div>
+      </div>
+      <div class="about-body">
+        <p>
+          Just a person on the internet with opinions, bad takes, and a passion for 
+          games, stories, music and everything in between.
+        </p>
+        <p>
+          This blog is my own space — no algorithm, no noise. 
+          Just me writing about whatever I feel like, whenever I feel like it.
+        </p>
+        <div class="tags">
+          <span class="tag">gaming</span>
+          <span class="tag">music</span>
+          <span class="tag">opinions</span>
+          <span class="tag">random stuff</span>
+          <span class="tag">reviews</span>
+          <span class="tag">life</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">SAEVASH.IO</div>
+    <div class="footer-copy">© 2026 Saevash — built with GitHub Pages</div>
+  </footer>
+
+</body>
+</html>
